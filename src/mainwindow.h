@@ -13,6 +13,8 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSplitter>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 #include <3rdparty/QtAwesome/QtAwesome.h>
 
@@ -120,6 +122,10 @@ private:
     DocumentStatisticsWidget *documentStatsWidget;
     SessionStatistics *sessionStats;
     SessionStatisticsWidget *sessionStatsWidget;
+    // WORKSPACE
+    QTreeWidget *workspaceWidget;
+    QTreeWidgetItem *treeItem;
+    //--
     QListWidget *cheatSheetWidget;
     QAction *recentFilesActions[MAX_RECENT_FILES];
     bool menuBarMenuActivated;

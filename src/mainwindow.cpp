@@ -28,6 +28,13 @@
 #include <QSizePolicy>
 #include <QStatusBar>
 #include <QTextDocumentFragment>
+// WORKSPACE
+#include <QModelIndex>
+#include <QFileSystemModel>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QStringList>
+//---
 
 #include <KAboutApplicationDialog>
 #include <KAboutData>
@@ -1297,6 +1304,30 @@ void MainWindow::buildSidebar()
     outlineWidget = new OutlineWidget(editor, this);
     outlineWidget->setAlternatingRowColors(false);
 
+    // WORKSPACE WIDGET
+    // https://doc.qt.io/qt-5/qtreewidget.html
+    // https://doc.qt.io/qt-5/qtreewidgetitem.html
+    // https://doc.qt.io/qt-5/qfilesystemmodel.html
+    // https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
+    
+    // QTreeWidget
+    workspaceWidget = new QTreeWidget(this);
+    workspaceWidget->setColumnCount(1);
+    workspaceWidget->setSelectionMode(QAbstractItemView::NoSelection);
+
+    // QTreeWidgetItems
+    QList<QTreeWidgetItem *> treeItems;
+    QFileSystemModel *fsm = new QFileSystemModel();
+    QModelIndex rootIndex = fsm->setRootPath("/home/kley/Nextcloud/Notes");
+
+    for (int i = rootIndex.row(); i < fsm->rowCount(); i++) {
+        treeItems << new QTreeWidgetItem(workspaceWidget, QStringList(fsm->fileName(rootIndex)));
+    }
+
+    workspaceWidget->addTopLevelItems(treeItems);
+
+    // -----
+
     documentStats = new DocumentStatistics((MarkdownDocument *) editor->document(), this);
     connect(documentStats, &DocumentStatistics::wordCountChanged,
             documentStatsWidget, &DocumentStatisticsWidget::setWordCount);
@@ -1338,6 +1369,7 @@ void MainWindow::buildSidebar()
     sidebar->addTab(QChar(fa::tachometeralt), sessionStatsWidget, tr("Session Statistics"));
     sidebar->addTab(QChar(fa::chartbar), documentStatsWidget, tr("Document Statistics"));
     sidebar->addTab(QChar(fa::markdown), cheatSheetWidget, tr("Cheat Sheet"), "cheatSheetTab");
+    sidebar->addTab(QChar(fa::hashtag), workspaceWidget, tr("Workspace"));
 
     int tabIndex = QSettings().value("sidebarCurrentTab", (int)FirstSidebarTab).toInt();
 
