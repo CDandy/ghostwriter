@@ -123,7 +123,7 @@ private:
     SessionStatistics *sessionStats;
     SessionStatisticsWidget *sessionStatsWidget;
     // WORKSPACE
-    QWidget *workspaceWidget;
+    //QWidget *workspaceWidget;
     QTreeView *workspaceView;
     QFileSystemModel *fsm;
     //--

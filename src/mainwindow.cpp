@@ -405,18 +405,18 @@ void MainWindow::buildWorkspace()
     // https://doc.qt.io/qt-5/qfilesystemmodel.html
     // https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
 
-    QVBoxLayout *layout = new QVBoxLayout();
+    // QVBoxLayout *layout = new QVBoxLayout();
     
-    workspaceWidget = new QWidget();
-    workspaceWidget->setLayout(layout);
-
+    
     fsm = new QFileSystemModel();
     fsm->setRootPath("/home/kley");
 
     workspaceView = new QTreeView();
     workspaceView->setModel(fsm);
 
-    layout->addWidget(workspaceView);
+    // workspaceWidget = new QWidget();
+    // workspaceWidget->setLayout(layout);
+    //layout->addWidget(workspaceView);
 
 
     // -----
@@ -1372,7 +1372,7 @@ void MainWindow::buildSidebar()
     sidebar->addTab(QChar(fa::tachometeralt), sessionStatsWidget, tr("Session Statistics"));
     sidebar->addTab(QChar(fa::chartbar), documentStatsWidget, tr("Document Statistics"));
     sidebar->addTab(QChar(fa::markdown), cheatSheetWidget, tr("Cheat Sheet"), "cheatSheetTab");
-    sidebar->addTab(QChar(fa::hashtag), workspaceWidget, tr("Workspace"), "workspaceTab");
+    sidebar->addTab(QChar(fa::hashtag), workspaceView, tr("Workspace"), "workspaceTab");
 
     int tabIndex = QSettings().value("sidebarCurrentTab", (int)FirstSidebarTab).toInt();
 
