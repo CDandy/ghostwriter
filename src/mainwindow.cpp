@@ -33,6 +33,7 @@
 #include <QFileSystemModel>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QTreeView>
 #include <QStringList>
 //---
 
@@ -121,6 +122,7 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
         &SpellCheckDecorator::settingsChanged
     );
 
+    buildWorkspace();
     buildSidebar();
 
     documentManager = new DocumentManager(editor, this);
@@ -341,7 +343,7 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
     sizes.append(otherWidth);
 
     splitter->setSizes(sizes);
-
+    
     // If previous splitter geometry was stored, load it.
     if (windowSettings.contains(GW_SPLITTER_GEOMETRY_KEY)) {
         this->splitter->restoreState(windowSettings.value(GW_SPLITTER_GEOMETRY_KEY).toByteArray());
@@ -393,6 +395,31 @@ MainWindow::~MainWindow()
 QSize MainWindow::sizeHint() const
 {
     return QSize(800, 500);
+}
+
+void MainWindow::buildWorkspace()
+{
+    // WORKSPACE TREE
+    // https://doc.qt.io/qt-5/qtreewidget.html
+    // https://doc.qt.io/qt-5/qtreewidgetitem.html
+    // https://doc.qt.io/qt-5/qfilesystemmodel.html
+    // https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    
+    workspaceWidget = new QWidget();
+    workspaceWidget->setLayout(layout);
+
+    fsm = new QFileSystemModel();
+    fsm->setRootPath("/home/kley");
+
+    workspaceView = new QTreeView();
+    workspaceView->setModel(fsm);
+
+    layout->addWidget(workspaceView);
+
+
+    // -----
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -1304,30 +1331,6 @@ void MainWindow::buildSidebar()
     outlineWidget = new OutlineWidget(editor, this);
     outlineWidget->setAlternatingRowColors(false);
 
-    // WORKSPACE WIDGET
-    // https://doc.qt.io/qt-5/qtreewidget.html
-    // https://doc.qt.io/qt-5/qtreewidgetitem.html
-    // https://doc.qt.io/qt-5/qfilesystemmodel.html
-    // https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
-    
-    // QTreeWidget
-    workspaceWidget = new QTreeWidget(this);
-    workspaceWidget->setColumnCount(1);
-    workspaceWidget->setSelectionMode(QAbstractItemView::NoSelection);
-
-    // QTreeWidgetItems
-    QList<QTreeWidgetItem *> treeItems;
-    QFileSystemModel *fsm = new QFileSystemModel();
-    QModelIndex rootIndex = fsm->setRootPath("/home/kley/Nextcloud/Notes");
-
-    for (int i = rootIndex.row(); i < fsm->rowCount(); i++) {
-        treeItems << new QTreeWidgetItem(workspaceWidget, QStringList(fsm->fileName(rootIndex)));
-    }
-
-    workspaceWidget->addTopLevelItems(treeItems);
-
-    // -----
-
     documentStats = new DocumentStatistics((MarkdownDocument *) editor->document(), this);
     connect(documentStats, &DocumentStatistics::wordCountChanged,
             documentStatsWidget, &DocumentStatisticsWidget::setWordCount);
@@ -1361,7 +1364,7 @@ void MainWindow::buildSidebar()
     connect(editor, SIGNAL(typingResumed()), sessionStats, SLOT(onTypingResumed()));
 
     sidebar = new Sidebar(this);
-    sidebar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sidebar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
     sidebar->setMinimumWidth(0.1 * QGuiApplication::primaryScreen()->availableSize().width());
     sidebar->setMaximumWidth(0.5 * QGuiApplication::primaryScreen()->availableSize().width());
 
@@ -1369,7 +1372,7 @@ void MainWindow::buildSidebar()
     sidebar->addTab(QChar(fa::tachometeralt), sessionStatsWidget, tr("Session Statistics"));
     sidebar->addTab(QChar(fa::chartbar), documentStatsWidget, tr("Document Statistics"));
     sidebar->addTab(QChar(fa::markdown), cheatSheetWidget, tr("Cheat Sheet"), "cheatSheetTab");
-    sidebar->addTab(QChar(fa::hashtag), workspaceWidget, tr("Workspace"));
+    sidebar->addTab(QChar(fa::hashtag), workspaceWidget, tr("Workspace"), "workspaceTab");
 
     int tabIndex = QSettings().value("sidebarCurrentTab", (int)FirstSidebarTab).toInt();
 

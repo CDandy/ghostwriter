@@ -216,6 +216,12 @@ ghostwriter--Sidebar QPushButton:checked:hover {
     background-color: $tertiary-fill-color;
 }
 
+/* Workspace tab */
+ghostwriter--Sidebar QTreeView {
+    padding: 0;
+    margin: 0;
+}
+
 /* Activity bar buttons */
 ghostwriter--Sidebar QPushButton[checkable="false"] {
     icon-size: 22px;

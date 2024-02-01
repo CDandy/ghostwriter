@@ -13,8 +13,8 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSplitter>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
+#include <QTreeView>
+#include <QFileSystemModel>
 
 #include <3rdparty/QtAwesome/QtAwesome.h>
 
@@ -123,8 +123,9 @@ private:
     SessionStatistics *sessionStats;
     SessionStatisticsWidget *sessionStatsWidget;
     // WORKSPACE
-    QTreeWidget *workspaceWidget;
-    QTreeWidgetItem *treeItem;
+    QWidget *workspaceWidget;
+    QTreeView *workspaceView;
+    QFileSystemModel *fsm;
     //--
     QListWidget *cheatSheetWidget;
     QAction *recentFilesActions[MAX_RECENT_FILES];
@@ -157,6 +158,8 @@ private:
     void buildMenuBar();
     void buildStatusBar();
     void buildSidebar();
+
+    void buildWorkspace();
 
     void adjustEditor();
 };
