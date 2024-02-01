@@ -414,6 +414,10 @@ void MainWindow::buildWorkspace()
     workspaceView = new QTreeView();
     workspaceView->setModel(fsm);
 
+    for (int j = 1; j < fsm->columnCount(); j++) {
+        workspaceView->hideColumn(j);
+    }
+
     // workspaceWidget = new QWidget();
     // workspaceWidget->setLayout(layout);
     //layout->addWidget(workspaceView);
