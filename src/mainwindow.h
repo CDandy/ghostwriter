@@ -89,6 +89,7 @@ private slots:
     void onSidebarVisibilityChanged(bool visible);
     void toggleSidebarVisible(bool visible);
     void runSpellCheck();
+    void openWorkspaceFile(const QModelIndex &index);
 
 private:
     QtAwesome *awesome;
@@ -123,7 +124,6 @@ private:
     SessionStatistics *sessionStats;
     SessionStatisticsWidget *sessionStatsWidget;
     // WORKSPACE
-    //QWidget *workspaceWidget;
     QTreeView *workspaceView;
     QFileSystemModel *fsm;
     //--

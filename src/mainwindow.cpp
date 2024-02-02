@@ -29,12 +29,9 @@
 #include <QStatusBar>
 #include <QTextDocumentFragment>
 // WORKSPACE
-#include <QModelIndex>
+#include <QDir>
 #include <QFileSystemModel>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 #include <QTreeView>
-#include <QStringList>
 //---
 
 #include <KAboutApplicationDialog>
@@ -122,7 +119,7 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
         &SpellCheckDecorator::settingsChanged
     );
 
-    buildWorkspace();
+    buildWorkspace(); // WORKSPACE
     buildSidebar();
 
     documentManager = new DocumentManager(editor, this);
@@ -138,6 +135,7 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
     connect(documentManager, SIGNAL(operationUpdate(QString)), this, SLOT(onOperationStarted(QString)));
     connect(documentManager, SIGNAL(operationFinished()), this, SLOT(onOperationFinished()));
     connect(documentManager, SIGNAL(documentClosed()), this, SLOT(refreshRecentFiles()));
+    connect(workspaceView, &QTreeView::doubleClicked, this, &MainWindow::openWorkspaceFile); // WORKSPACE
 
     editor->setAutoMatchEnabled('\"', appSettings->autoMatchCharEnabled('\"'));
     editor->setAutoMatchEnabled('\'', appSettings->autoMatchCharEnabled('\''));
@@ -397,34 +395,35 @@ QSize MainWindow::sizeHint() const
     return QSize(800, 500);
 }
 
+// WORKSPACE TREE
+// https://doc.qt.io/qt-5/qtreeview.html
+// https://doc.qt.io/qt-5/qfilesystemmodel.html
+// https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
+
 void MainWindow::buildWorkspace()
 {
-    // WORKSPACE TREE
-    // https://doc.qt.io/qt-5/qtreewidget.html
-    // https://doc.qt.io/qt-5/qtreewidgetitem.html
-    // https://doc.qt.io/qt-5/qfilesystemmodel.html
-    // https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
 
-    // QVBoxLayout *layout = new QVBoxLayout();
-    
     
     fsm = new QFileSystemModel();
-    fsm->setRootPath("/home/kley");
+    fsm->setRootPath(QDir::currentPath());
 
     workspaceView = new QTreeView();
     workspaceView->setModel(fsm);
+    workspaceView->setRootIndex(fsm->index(QDir::currentPath()));
 
     for (int j = 1; j < fsm->columnCount(); j++) {
         workspaceView->hideColumn(j);
     }
-
-    // workspaceWidget = new QWidget();
-    // workspaceWidget->setLayout(layout);
-    //layout->addWidget(workspaceView);
-
-
-    // -----
 }
+
+void MainWindow::openWorkspaceFile(const QModelIndex &index)
+{
+    documentManager->open(fsm->filePath(index));
+}
+
+
+// -----
+
 
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
