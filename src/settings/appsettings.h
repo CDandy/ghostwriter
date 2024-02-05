@@ -39,6 +39,9 @@ public:
 
     void store();
 
+    QString lastWorkspacePath() const;
+    void setLastWorkspacePath(QString workspacePath);
+
     QString themeDirectoryPath() const;
     QString draftLocation() const;
 

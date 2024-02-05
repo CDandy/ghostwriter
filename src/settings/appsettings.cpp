@@ -58,6 +58,7 @@ constexpr auto GW_LAST_USED_EXPORTER_PARAMS_KEY{"Preview/lastUsedExporterParams"
 constexpr auto GW_PREVIEW_TEXT_FONT_KEY{"Preview/textFont"};
 constexpr auto GW_PREVIEW_CODE_FONT_KEY{"Preview/codeFont"};
 constexpr auto GW_BACKUP_LOCATION_KEY{"Backup/location"};
+constexpr auto GW_LAST_WORKSPACE_PATH_KEY{"Session/lastWorkspacePath"};
 }
 
 class AppSettingsPrivate
@@ -111,6 +112,8 @@ public:
     QString themeName;
     bool darkModeEnabled;
     bool showUnbreakableSpaceEnabled;
+
+    QString lastWorkspacePath;
 };
 
 AppSettings *AppSettingsPrivate::instance = nullptr;
@@ -167,7 +170,21 @@ void AppSettings::store()
     appSettings.setValue(constants::GW_UNBREAKABLE_SPACE, QVariant(d->showUnbreakableSpaceEnabled));
     appSettings.setValue(constants::GW_BACKUP_LOCATION_KEY, QVariant(d->backupLocation));
 
+    appSettings.setValue(constants::GW_LAST_WORKSPACE_PATH_KEY, QVariant(d->lastWorkspacePath));
+
     appSettings.sync();
+}
+
+QString AppSettings::lastWorkspacePath() const
+{
+    Q_D(const AppSettings);
+    return d->lastWorkspacePath;
+}
+
+void AppSettings::setLastWorkspacePath(QString workspacePath)
+{
+    Q_D(AppSettings);
+    d->lastWorkspacePath = workspacePath;
 }
 
 QString AppSettings::themeDirectoryPath() const
@@ -826,6 +843,8 @@ AppSettings::AppSettings()
     } else {
         d->currentHtmlExporter->setOptions(appSettings.value(constants::GW_LAST_USED_EXPORTER_PARAMS_KEY).toString());
     }
+
+    d->lastWorkspacePath = appSettings.value(constants::GW_LAST_WORKSPACE_PATH_KEY, QVariant(QDir::currentPath())).toString();
 }
 
 QString AppSettingsPrivate::firstAvailableFont(const QStringList& fontList) const

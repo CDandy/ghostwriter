@@ -70,6 +70,7 @@ enum SidebarTabIndex {
 #define GW_MAIN_WINDOW_GEOMETRY_KEY "Window/mainWindowGeometry"
 #define GW_MAIN_WINDOW_STATE_KEY "Window/mainWindowState"
 #define GW_SPLITTER_GEOMETRY_KEY "Window/splitterGeometry"
+#define WORKSPACE_PATH_KEY "workspacePath"
 
 MainWindow::MainWindow(const QString &filePath, QWidget *parent)
     : QMainWindow(parent)
@@ -403,15 +404,16 @@ QSize MainWindow::sizeHint() const
 void MainWindow::buildWorkspace()
 {
     QStringList fileFilters = { "*.md", "*.markdown", "*.mdown", "*.mkdn", "*.mkd", "*.mdwn", "*.mdtxt", "*.mdtext", "*.text", "*.Rmd", "*.txt" };
+    QString lastWorkspace = appSettings->lastWorkspacePath();
     
     fsm = new QFileSystemModel();
-    fsm->setRootPath(QDir::currentPath());
-    fsm->setNameFilterDisables(false); // true : show but disable, false : hide filtered names
-    fsm->setNameFilters(fileFilters);
+    fsm->setRootPath(lastWorkspace);
+    //fsm->setNameFilterDisables(true); // true : show but disable, false : hide filtered names
+    //fsm->setNameFilters(fileFilters);
 
     workspaceView = new QTreeView();
     workspaceView->setModel(fsm);
-    workspaceView->setRootIndex(fsm->index(QDir::currentPath()));
+    workspaceView->setRootIndex(fsm->index(lastWorkspace));
 
     for (int j = 1; j < fsm->columnCount(); j++) {
         workspaceView->hideColumn(j);
@@ -423,6 +425,7 @@ void MainWindow::openWorkspaceFolder()
     QString folderName = QFileDialog::getExistingDirectory(this, tr("Open Workspace Folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     fsm->setRootPath(folderName);
     workspaceView->setRootIndex(fsm->index(folderName));
+    appSettings->setLastWorkspacePath(folderName);
 }
 
 void MainWindow::openFileFromWorkspace(const QModelIndex &index)
@@ -1381,7 +1384,7 @@ void MainWindow::buildSidebar()
     sidebar->setMinimumWidth(0.1 * QGuiApplication::primaryScreen()->availableSize().width());
     sidebar->setMaximumWidth(0.5 * QGuiApplication::primaryScreen()->availableSize().width());
 
-    sidebar->addTab(QChar(fa::foldertree), workspaceView, tr("Workspace"), "workspaceTab");
+    sidebar->addTab(QChar(fa::folder), workspaceView, tr("Workspace"), "workspaceTab");
     sidebar->addTab(QChar(fa::hashtag), outlineWidget, tr("Outline"));
     sidebar->addTab(QChar(fa::tachometeralt), sessionStatsWidget, tr("Session Statistics"));
     sidebar->addTab(QChar(fa::chartbar), documentStatsWidget, tr("Document Statistics"));
