@@ -908,7 +908,7 @@ void MarkdownEditor::insertFromMimeData(const QMimeData *source)
         QImage image = qvariant_cast<QImage>(source->imageData());
         QString imagePath, startingDirectory;
 
-        QString documentName = QFileInfo(d->textDocument->filePath()).baseName();
+        QString documentName = QFileInfo(d->textDocument->filePath()).baseName().remove(QRegExp("[^a-zA-Z0-9\\s]")).replace(QRegExp("\\s+"), "-");
         if (!d->textDocument->isNew()) {
             startingDirectory = QFileInfo(d->textDocument->filePath()).dir().path();
             imagePath = startingDirectory + "/" + documentName + "_";
@@ -916,7 +916,7 @@ void MarkdownEditor::insertFromMimeData(const QMimeData *source)
             imagePath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/";
         }
 
-        imagePath += QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz") + ".png";
+        imagePath += QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".png";
 
         imagePath = QFileDialog::getSaveFileName(
             this,

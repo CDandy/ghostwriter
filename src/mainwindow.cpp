@@ -408,8 +408,7 @@ void MainWindow::buildWorkspace()
     
     fsm = new QFileSystemModel();
     fsm->setRootPath(lastWorkspace);
-    //fsm->setNameFilterDisables(true); // true : show but disable, false : hide filtered names
-    //fsm->setNameFilters(fileFilters);
+    fsm->setFilter(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::AllDirs);
 
     workspaceView = new QTreeView();
     workspaceView->setModel(fsm);
