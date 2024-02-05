@@ -89,7 +89,8 @@ private slots:
     void onSidebarVisibilityChanged(bool visible);
     void toggleSidebarVisible(bool visible);
     void runSpellCheck();
-    void openWorkspaceFile(const QModelIndex &index);
+    void openWorkspaceFolder();
+    void openFileFromWorkspace(const QModelIndex &index);
 
 private:
     QtAwesome *awesome;

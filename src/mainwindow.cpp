@@ -135,7 +135,7 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
     connect(documentManager, SIGNAL(operationUpdate(QString)), this, SLOT(onOperationStarted(QString)));
     connect(documentManager, SIGNAL(operationFinished()), this, SLOT(onOperationFinished()));
     connect(documentManager, SIGNAL(documentClosed()), this, SLOT(refreshRecentFiles()));
-    connect(workspaceView, &QTreeView::doubleClicked, this, &MainWindow::openWorkspaceFile); // WORKSPACE
+    connect(workspaceView, &QTreeView::doubleClicked, this, &MainWindow::openFileFromWorkspace); // WORKSPACE
 
     editor->setAutoMatchEnabled('\"', appSettings->autoMatchCharEnabled('\"'));
     editor->setAutoMatchEnabled('\'', appSettings->autoMatchCharEnabled('\''));
@@ -402,10 +402,12 @@ QSize MainWindow::sizeHint() const
 
 void MainWindow::buildWorkspace()
 {
-
+    QStringList fileFilters = { "*.md", "*.markdown", "*.mdown", "*.mkdn", "*.mkd", "*.mdwn", "*.mdtxt", "*.mdtext", "*.text", "*.Rmd", "*.txt" };
     
     fsm = new QFileSystemModel();
     fsm->setRootPath(QDir::currentPath());
+    fsm->setNameFilterDisables(false); // true : show but disable, false : hide filtered names
+    fsm->setNameFilters(fileFilters);
 
     workspaceView = new QTreeView();
     workspaceView->setModel(fsm);
@@ -416,7 +418,14 @@ void MainWindow::buildWorkspace()
     }
 }
 
-void MainWindow::openWorkspaceFile(const QModelIndex &index)
+void MainWindow::openWorkspaceFolder()
+{
+    QString folderName = QFileDialog::getExistingDirectory(this, tr("Open Workspace Folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    fsm->setRootPath(folderName);
+    workspaceView->setRootIndex(fsm->index(folderName));
+}
+
+void MainWindow::openFileFromWorkspace(const QModelIndex &index)
 {
     documentManager->open(fsm->filePath(index));
 }
@@ -949,6 +958,7 @@ void MainWindow::buildMenuBar()
 
     fileMenu->addAction(createWindowAction(tr("&New"), documentManager, SLOT(close()), QKeySequence::New));
     fileMenu->addAction(createWindowAction(tr("&Open"), documentManager, SLOT(open()), QKeySequence::Open));
+    fileMenu->addAction(createWindowAction(tr("&Open Folder"), this, SLOT(openWorkspaceFolder()), QKeySequence(tr("Ctrl+Shift+o"))));
 
     QMenu *recentFilesMenu = new QMenu(tr("Open &Recent..."), fileMenu);
     recentFilesMenu->addAction(createWindowAction(tr("Reopen Closed File"), documentManager, SLOT(reopenLastClosedFile()), QKeySequence("SHIFT+CTRL+T")));
@@ -1371,11 +1381,11 @@ void MainWindow::buildSidebar()
     sidebar->setMinimumWidth(0.1 * QGuiApplication::primaryScreen()->availableSize().width());
     sidebar->setMaximumWidth(0.5 * QGuiApplication::primaryScreen()->availableSize().width());
 
+    sidebar->addTab(QChar(fa::foldertree), workspaceView, tr("Workspace"), "workspaceTab");
     sidebar->addTab(QChar(fa::hashtag), outlineWidget, tr("Outline"));
     sidebar->addTab(QChar(fa::tachometeralt), sessionStatsWidget, tr("Session Statistics"));
     sidebar->addTab(QChar(fa::chartbar), documentStatsWidget, tr("Document Statistics"));
     sidebar->addTab(QChar(fa::markdown), cheatSheetWidget, tr("Cheat Sheet"), "cheatSheetTab");
-    sidebar->addTab(QChar(fa::hashtag), workspaceView, tr("Workspace"), "workspaceTab");
 
     int tabIndex = QSettings().value("sidebarCurrentTab", (int)FirstSidebarTab).toInt();
 
