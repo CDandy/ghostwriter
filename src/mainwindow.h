@@ -13,8 +13,6 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSplitter>
-#include <QTreeView>
-#include <QFileSystemModel>
 
 #include <3rdparty/QtAwesome/QtAwesome.h>
 
@@ -34,6 +32,7 @@
 #include "outlinewidget.h"
 #include "sidebar.h"
 #include "timelabel.h"
+#include "workspacewidget.h"
 
 #define MAX_RECENT_FILES 10
 
@@ -90,10 +89,6 @@ private slots:
     void toggleSidebarVisible(bool visible);
     void runSpellCheck();
 
-    void openWorkspaceFolder();
-    void openFileFromWorkspace(const QModelIndex &index);
-    void updateWorkspaceView();
-
 private:
     QtAwesome *awesome;
     MarkdownEditor *editor;
@@ -126,10 +121,6 @@ private:
     DocumentStatisticsWidget *documentStatsWidget;
     SessionStatistics *sessionStats;
     SessionStatisticsWidget *sessionStatsWidget;
-    // WORKSPACE
-    QTreeView *workspaceView;
-    QFileSystemModel *fsm;
-    //--
     QListWidget *cheatSheetWidget;
     QAction *recentFilesActions[MAX_RECENT_FILES];
     bool menuBarMenuActivated;
@@ -141,6 +132,8 @@ private:
     QList<QWidget *> statusBarWidgets;
 
     AppSettings *appSettings;
+
+    WorkspaceWidget *workspaceWidget;
 
     QAction* createWindowAction
     (
@@ -161,8 +154,6 @@ private:
     void buildMenuBar();
     void buildStatusBar();
     void buildSidebar();
-
-    void buildWorkspace();
 
     void adjustEditor();
 };
