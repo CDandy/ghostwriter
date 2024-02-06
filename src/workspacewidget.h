@@ -1,6 +1,11 @@
+/**
+ * Oui
+*/
+
 #ifndef WORKSPACEWIDGET_H
 #define WORKSPACEWIDGET_H
 
+#include <QFrame>
 #include <QWidget>
 #include <QTreeView>
 #include <QFileSystemModel>
@@ -13,47 +18,47 @@
 
 namespace ghostwriter
 {
+/**
+ * Workspace Widget
+ * 
+ * A "workspace" is simply a project root folder used to browse files
+ * 
+ * https://doc.qt.io/qt-5/qtreeview.html
+ * https://doc.qt.io/qt-5/qfilesystemmodel.html
+ * https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
+*/
+class WorkspaceWidget : public QFrame
+{
+    Q_OBJECT
+
+public:
     /**
-     * Workspace Widget
-     * 
-     * A "workspace" is simply a project root folder used to browse files
-     * 
-     * https://doc.qt.io/qt-5/qtreeview.html
-     * https://doc.qt.io/qt-5/qfilesystemmodel.html
-     * https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
+     * Constructor
     */
-    class WorkspaceWidget : public QWidget
-    {
-        Q_OBJECT
+    WorkspaceWidget(QWidget *parent = nullptr);
 
-        public:
-            /**
-             * Constructor
-            */
-            WorkspaceWidget(QWidget *parent = nullptr);
+    /**
+     * Destructor
+    */
+    virtual ~WorkspaceWidget();
 
-            /**
-             * Destructor
-            */
-            virtual ~WorkspaceWidget();
+    void setCurrentFile(const QString &filePath);
 
-            void setCurrentFile(const QString &filePath);
+signals:
+    void fileDoubleClicked(const QString &filePath);
 
-        signals:
-            void fileDoubleClicked(const QString &filePath);
+public slots:
+    void openFolder();
+    void openFileFromTreeView(const QModelIndex &index);
 
-        public slots:
-            void openFolder();
-            void openFileFromTreeView(const QModelIndex &index);
+private:
+    QVBoxLayout *layout;
+    QFileSystemModel *fsModel;
+    QTreeView *treeView;
+    AppSettings *appSettings;
 
-        private:
-            QVBoxLayout *layout;
-            QFileSystemModel *fsModel;
-            QTreeView *treeView;
-            AppSettings *appSettings;
-
-            void hideColumns();
-    };
+    void hideColumns();
+};
 } // namespace ghostwriter
 
-#endif // WORKSPACEWIDGET_H
+#endif

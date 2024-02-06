@@ -27,12 +27,12 @@
 #include "theme/theme.h"
 #include "theme/themerepository.h"
 
+#include "workspacewidget.h"
 #include "documentmanager.h"
 #include "findreplace.h"
 #include "outlinewidget.h"
 #include "sidebar.h"
 #include "timelabel.h"
-#include "workspacewidget.h"
 
 #define MAX_RECENT_FILES 10
 

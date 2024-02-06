@@ -70,6 +70,7 @@ target_sources(ghostwriter PRIVATE
     outlinewidget.cpp
     sidebar.cpp
     timelabel.cpp
+    workspacewidget.cpp
     ${ghostwriter_QM_LOADER}
 )
 

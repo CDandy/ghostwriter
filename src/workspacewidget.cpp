@@ -1,3 +1,7 @@
+/**
+ * Oui
+ */
+
 #include "workspacewidget.h"
 
 namespace ghostwriter
@@ -5,7 +9,7 @@ namespace ghostwriter
     /**
      * Constructor
      */
-    WorkspaceWidget::WorkspaceWidget(QWidget *parent) : QWidget(parent)
+    WorkspaceWidget::WorkspaceWidget(QWidget *parent) : QFrame(parent)
     {
         // Get last opened folder
         appSettings = AppSettings::instance();
@@ -20,6 +24,7 @@ namespace ghostwriter
         treeView = new QTreeView();
         treeView->setModel(fsModel);
         treeView->setRootIndex(lastWorkspaceIndex);
+        treeView->setHeaderHidden(true);
         hideColumns();
 
         connect(treeView, &QTreeView::doubleClicked, this, &WorkspaceWidget::openFileFromTreeView);
@@ -31,7 +36,7 @@ namespace ghostwriter
 
     /**
      * Hide columns other than file name
-    */
+     */
     void WorkspaceWidget::hideColumns()
     {
         for (int j = 1; j < fsModel->columnCount(); j++)
@@ -48,7 +53,7 @@ namespace ghostwriter
         QString folderName = QFileDialog::getExistingDirectory(this, tr("Open Workspace Folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
         QModelIndex rootIndex = fsModel->setRootPath(folderName);
 
-        workspaceView->setRootIndex(rootIndex);
+        treeView->setRootIndex(rootIndex);
         appSettings->setLastWorkspacePath(folderName);
     }
 
@@ -65,5 +70,10 @@ namespace ghostwriter
     void WorkspaceWidget::openFileFromTreeView(const QModelIndex &index)
     {
         emit fileDoubleClicked(fsModel->filePath(index));
+    }
+
+    WorkspaceWidget::~WorkspaceWidget()
+    {
+        ;
     }
 }
