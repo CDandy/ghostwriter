@@ -136,7 +136,9 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
     connect(documentManager, SIGNAL(operationUpdate(QString)), this, SLOT(onOperationStarted(QString)));
     connect(documentManager, SIGNAL(operationFinished()), this, SLOT(onOperationFinished()));
     connect(documentManager, SIGNAL(documentClosed()), this, SLOT(refreshRecentFiles()));
+
     connect(workspaceView, &QTreeView::doubleClicked, this, &MainWindow::openFileFromWorkspace); // WORKSPACE
+    
 
     editor->setAutoMatchEnabled('\"', appSettings->autoMatchCharEnabled('\"'));
     editor->setAutoMatchEnabled('\'', appSettings->autoMatchCharEnabled('\''));
@@ -271,6 +273,8 @@ MainWindow::MainWindow(const QString &filePath, QWidget *parent)
         [this]() {
             this->sessionStats->startNewSession(this->documentStats->wordCount());
             refreshRecentFiles();
+
+            this->updateWorkspaceView();
         }
     );
 
@@ -400,7 +404,6 @@ QSize MainWindow::sizeHint() const
 // https://doc.qt.io/qt-5/qtreeview.html
 // https://doc.qt.io/qt-5/qfilesystemmodel.html
 // https://doc.qt.io/qt-5/qtwidgets-itemviews-dirview-example.html
-
 void MainWindow::buildWorkspace()
 {
     QStringList fileFilters = { "*.md", "*.markdown", "*.mdown", "*.mkdn", "*.mkd", "*.mdwn", "*.mdtxt", "*.mdtext", "*.text", "*.Rmd", "*.txt" };
@@ -430,6 +433,14 @@ void MainWindow::openWorkspaceFolder()
 void MainWindow::openFileFromWorkspace(const QModelIndex &index)
 {
     documentManager->open(fsm->filePath(index));
+}
+
+void MainWindow::updateWorkspaceView()
+{
+    QString filePath = documentManager->document()->filePath();
+    QModelIndex pathIndex = fsm->index(filePath);
+
+    workspaceView->selectionModel()->setCurrentIndex(pathIndex, QItemSelectionModel::Current);
 }
 
 
